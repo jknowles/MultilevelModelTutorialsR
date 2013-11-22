@@ -1,0 +1,75 @@
+Getting Started with Multilevel Modeling in R
+========================================================
+
+## Jared E. Knowles
+
+# Introduction
+
+Analysts dealing with grouped data and complex hierarchical structures in their 
+data ranging from measurements nested within participants, to counties nested within 
+states or students nested within classrooms often find themselves in need of modeling 
+tools to reflect this structure of their data. In R there are two predominant ways 
+to fit multilevel models that account for such structure in the data. These tutorials 
+will show the user how to use both the `lme4` package in R to fit linear and nonlinear 
+mixed effect models, and to use `rstan` to fit fully Bayesian multilevel models. The 
+focus here will be on how to fit the models in R and not the theory behind the models. 
+For background on multilevel modeling, see the references. [1]
+
+This tutorial will cover getting set up and running a few basic models using `lme4` 
+in R.Future tutorials will cover:
+
+* constructing varying intercept, varying slope, and varying slope and intercept models in R
+* generating predictions and interpreting parameters from mixed-effect models
+* generalized and non-linear multilevel models
+* fully Bayesian multilevel models fit with `rstan` or other MCMC methods
+
+# Setting up your enviRonment
+
+Getting started with multilevel modeling in R is simple. `lme4` is the canonical 
+package for implementing multilevel models in R, though there are a number of packages 
+that depend on and enhance its feature set, including Bayesian extensions. `lme4` 
+has been recently rewritten to improve speed and to incorporate a C++ codebase, and 
+as such the features of the package are somewhat in flux. Be sure to update the package 
+frequently. 
+
+To install `lme4`, we just run:
+
+```{r eval=FALSE, results='hide', echo=TRUE}
+# Main version
+install.packages("lme4")
+
+# Or to install the dev version
+library(devtools)
+install_github("lme4",user="lme4") 
+```
+
+```{r setup, echo=FALSE, error=FALSE, message=FALSE, eval=TRUE, results='hide'}
+opts_chunk$set(dev='svg', fig.width=6, fig.height=6, echo=TRUE, 
+               message=FALSE, error=FALSE)
+
+```
+
+# Read in the data
+
+Multilevel models are appropriate for a particular kind of data structure where 
+units are nested within groups (generally 5+ groups) and where we want to model 
+the group structure of the data. For our introductory example we will start with 
+a simple example from the `lme4` documentation and explain what the model is doing. 
+
+```{r loadandviewdata}
+data(sleepstudy)
+
+str(sleepstudy)
+
+summary(sleepstudy)
+
+```
+
+Here we have data on reaction times of subjects in a study about sleep. Each subject 
+is observed ten times - once per day. Thus we have observations nested within subjects. 
+
+# Fit the Non-Multilevel Models
+
+
+
+[1] Examples include Gelman and Hill, Gelman et al. 2013, etc. 
