@@ -16,7 +16,7 @@ focus here will be on how to fit the models in R and not the theory behind the m
 For background on multilevel modeling, see the references. [1]
 
 This tutorial will cover getting set up and running a few basic models using `lme4` 
-in R.Future tutorials will cover:
+in R. Future tutorials will cover:
 
 * constructing varying intercept, varying slope, and varying slope and intercept models in R
 * generating predictions and interpreting parameters from mixed-effect models
@@ -45,7 +45,7 @@ install_github("lme4",user="lme4")
 
 ```{r setup, echo=FALSE, error=FALSE, message=FALSE, eval=TRUE, results='hide'}
 opts_chunk$set(dev='svg', fig.width=6, fig.height=6, echo=TRUE, 
-               message=FALSE, error=FALSE)
+               message=FALSE, error=FALSE, warning=FALSE)
 
 ```
 
@@ -70,13 +70,28 @@ Here we have data on the extroversion of subjects nested within classes and with
 schools. 
 
 # Fit the Non-Multilevel Models
+
+Let's start by fitting a simple OLS regression of measures of openness, agreeableness, 
+and socialability on extroversion. Here we use the `display` function in the 
+excellent `arm` package for abbreviated output. Other options include `stargazer` 
+for LaTeX typeset tables, `xtable`, or the `ascii` package for more flexible 
+plain text output options. 
+
 ```{r nonlmermodels}
 OLSexamp <- lm(extro ~ open + agree + social, data = lmm.data)
 display(OLSexamp)
 ```
 
-So far this model does not fit very well at all. Let's get the AIC to compare 
-to mixed effect models:
+So far this model does not fit very well at all. The R model interface is quite a 
+simple one with the dependent variable being specified first, followed by the 
+`~` symbol. The righ hand side, predictor variables, are each named. Addition 
+signs indicate that these are modeled as additive effects. Finally, we specify 
+that datframe on which to calculate the model. Here we use the `lm` function to 
+perform OLS regression, but there are many other options in R. 
+
+If we want to extract measures such as the AIC, we may prefer to fit a generalized 
+linear model with `glm` which produces a model fit through maximum likelihood 
+estimation. Note that the model formula specification is the same. 
 
 ```{r nonlmerglm}
 MLexamp <- glm(extro ~ open + agree + social, data=lmm.data)
@@ -84,9 +99,13 @@ display(MLexamp)
 AIC(MLexamp)
 ```
 
-Not a good model fit. Let's look at a simple varying intercept model now. 
+This results in a poor model fit. Let's look at a simple varying intercept model now. 
 
 # Fit a varying intercept model
+
+Depending on disciplinary norms, our next step might be to fit a varying intercept 
+model using a grouping variable such as school or classes. Using the `glm` function 
+and the familiar formula interface, such a fit is easy:
 
 ```{r nonlmerfixedeffect}
 MLexamp.2 <- glm(extro ~ open + agree + social + class, data=lmm.data )
@@ -97,7 +116,8 @@ anova(MLexamp, MLexamp.2, test="F")
 
 This is called a fixed-effects specification often. This is simply the case of 
 fitting a separate dummy variable as a predictor for each class. We can see 
-this does not provide much additional model fit. 
+this does not provide much additional model fit. Let's see if school performs 
+any better. 
 
 ```{r nonlmerfixedeffect2}
 MLexamp.3 <- glm(extro ~ open + agree + social + school, data=lmm.data )
@@ -117,7 +137,8 @@ table(lmm.data$school, lmm.data$class)
 Here we can see we have a perfectly balanced design with fifty observations in 
 each combination of class and school (if only data were always so nice!). 
 
-Let's try to model each of these unique cells:
+Let's try to model each of these unique cells. To do this, we fit a model and use 
+the `:` operator to specify the interaction between `school` and `class`. 
 
 ```{r itneraction}
 MLexamp.4 <- glm(extro ~ open + agree + social + school:class, data=lmm.data )
@@ -126,7 +147,7 @@ AIC(MLexamp.4)
 ```
 
 This is very useful, but what if we want to understand both the effect of the 
-school and the effect of the class, as well as the effect of schools and classes? 
+school and the effect of the class, as well as the effect of the schools and classes? 
 Unfortunately, this is not easily done with the standard `glm`. 
 
 ```{r itneraction2}
@@ -135,19 +156,88 @@ display(MLexamp.5)
 AIC(MLexamp.5)
 ```
 
+# Exploring Random Slopes
+
+Another alternative is to fit a separate model for each of the school and class 
+combinations. If we believe the relationsihp between our variables may be highly 
+dependent on the school and class combination, we can simply fit a series of models 
+and explore the parameter variation among them:
+
+```{r}
+require(plyr)
+
+modellist <- dlply(lmm.data, .(school, class), function(x) 
+                              glm(extro~ open + agree + social, data=x))
+display(modellist[[1]])
+display(modellist[[2]])
+
+```
+
+We will discuss this strategy in more depth in future tutorials including how to 
+performan inference on the list of models produced in this command. 
+
 # Fit a varying intercept model with lmer
 
+Enter `lme4`. While all of the above techniques are valid approaches to this problem, 
+they are not necessarily the best approach when we are interested explicitly in 
+variation among and by groups. This is where a mixed-effect modeling framework 
+is useful. Now we use the `lmer` function with the familiar formula interface, 
+but now group level variables are specified using a special syntax: `(1|school)` 
+tells `lmer` to fit a linear model with a varying-intercept group effect using 
+the variable `school`. 
+
 ```{r lmer1}
-MLexamp.6 <- lmer(extro ~ open + agree + social + (1|school/class), data=lmm.data)
+MLexamp.6 <- lmer(extro ~ open + agree + social + (1|school), data=lmm.data)
 display(MLexamp.6)
 ```
 
-# Fit a varying slope model with lmer
+We can fit multiple group effects with multiple group effect terms. 
+
 
 ```{r lmer2}
-MLexamp.7 <- lmer(extro ~ open + agree + social + (1+open|school/class), data=lmm.data)
+MLexamp.7 <- lmer(extro ~ open + agree + social + (1|school) + (1|class), data=lmm.data)
 display(MLexamp.7)
-M7.sim <- sim(MLexamp.7)
 ```
 
-[1] Examples include Gelman and Hill, Gelman et al. 2013, etc. 
+And finally, we can fit nested group effect terms through the following syntax:
+
+```{r lmer3}
+MLexamp.8 <- lmer(extro ~ open + agree + social + (1|school/class), data=lmm.data)
+display(MLexamp.8)
+
+
+```
+
+Here the `(1|school/class)` says that we want to fit a mixed effect term for varying 
+intercepts `1|` by schools, and for classes that are nested within schools. 
+
+# Fit a varying slope model with lmer
+
+But, what if we want to explore the effect of different student level indicators 
+as they vary across classrooms. Instead of fitting unique models by school (or school/class) 
+we can fit a varying slope model. Here we modify our random effect term to include 
+variables before the grouping terms: `(1 + open|school/class)` tells R to fit 
+a varying slope and varying intercept model for schools and classes nested within 
+schools, and to allow the slope of the `open` variable to vary by school. 
+
+```{r lmer4}
+MLexamp.9 <- lmer(extro ~ open + agree + social + (1+open|school/class), data=lmm.data)
+display(MLexamp.9)
+```
+
+# Conclusion
+
+Fitting mixed effect models and exploring group level variation is very easy within 
+the R language and ecosystem. In future tutorials we will explore comparing across 
+models, doing inference with mixed-effect models, and creating graphical representations 
+of mixed effect models to understand their effects. 
+
+# Appendix
+
+```{r sessioninfo}
+print(sessionInfo(),locale=FALSE)
+
+```
+
+[1] Examples include [Gelman and Hill](http://stat.columbia.edu/~gelman/arm), 
+[Gelman et al. 2013](http://stat.columbia.edu/~gelman/book/), etc. 
