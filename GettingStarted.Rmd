@@ -55,21 +55,99 @@ Multilevel models are appropriate for a particular kind of data structure where
 units are nested within groups (generally 5+ groups) and where we want to model 
 the group structure of the data. For our introductory example we will start with 
 a simple example from the `lme4` documentation and explain what the model is doing. 
+We will use data from Jon Starkweather at the [University of North Texas](http://www.unt.edu/rss/class/Jon/R_SC/). Visit the excellent tutorial [available here for more.](http://www.unt.edu/rss/class/Jon/R_SC/Module9/LMM_Examples.R)
 
 ```{r loadandviewdata}
-data(sleepstudy)
+library(lme4) # load library
+library(arm) # convenience functions for regression in R
+lmm.data <- read.table("http://www.unt.edu/rss/class/Jon/R_SC/Module9/lmm.data.txt",
+   header=TRUE, sep=",", na.strings="NA", dec=".", strip.white=TRUE)
+#summary(lmm.data)
+head(lmm.data)
+```
 
-str(sleepstudy)
+Here we have data on the extroversion of subjects nested within classes and within 
+schools. 
 
-summary(sleepstudy)
+# Fit the Non-Multilevel Models
+```{r nonlmermodels}
+OLSexamp <- lm(extro ~ open + agree + social, data = lmm.data)
+display(OLSexamp)
+```
+
+So far this model does not fit very well at all. Let's get the AIC to compare 
+to mixed effect models:
+
+```{r nonlmerglm}
+MLexamp <- glm(extro ~ open + agree + social, data=lmm.data)
+display(MLexamp)
+AIC(MLexamp)
+```
+
+Not a good model fit. Let's look at a simple varying intercept model now. 
+
+# Fit a varying intercept model
+
+```{r nonlmerfixedeffect}
+MLexamp.2 <- glm(extro ~ open + agree + social + class, data=lmm.data )
+display(MLexamp.2)
+AIC(MLexamp.2)
+anova(MLexamp, MLexamp.2, test="F")
+```
+
+This is called a fixed-effects specification often. This is simply the case of 
+fitting a separate dummy variable as a predictor for each class. We can see 
+this does not provide much additional model fit. 
+
+```{r nonlmerfixedeffect2}
+MLexamp.3 <- glm(extro ~ open + agree + social + school, data=lmm.data )
+display(MLexamp.3)
+AIC(MLexamp.3)
+anova(MLexamp, MLexamp.3, test="F")
+```
+
+The school effect greatly improves our model fit. However, how do we interpret these
+effects? 
+
+```{r effectbreakdown}
+table(lmm.data$school, lmm.data$class)
 
 ```
 
-Here we have data on reaction times of subjects in a study about sleep. Each subject 
-is observed ten times - once per day. Thus we have observations nested within subjects. 
+Here we can see we have a perfectly balanced design with fifty observations in 
+each combination of class and school (if only data were always so nice!). 
 
-# Fit the Non-Multilevel Models
+Let's try to model each of these unique cells:
 
+```{r itneraction}
+MLexamp.4 <- glm(extro ~ open + agree + social + school:class, data=lmm.data )
+display(MLexamp.4)
+AIC(MLexamp.4)
+```
 
+This is very useful, but what if we want to understand both the effect of the 
+school and the effect of the class, as well as the effect of schools and classes? 
+Unfortunately, this is not easily done with the standard `glm`. 
+
+```{r itneraction2}
+MLexamp.5 <- glm(extro ~ open + agree + social + school*class - 1, data=lmm.data )
+display(MLexamp.5)
+AIC(MLexamp.5)
+```
+
+# Fit a varying intercept model with lmer
+
+```{r lmer1}
+MLexamp.6 <- lmer(extro ~ open + agree + social + (1|school/class), data=lmm.data)
+display(MLexamp.6)
+```
+
+# Fit a varying slope model with lmer
+
+```{r lmer2}
+MLexamp.7 <- lmer(extro ~ open + agree + social + (1+open|school/class), data=lmm.data)
+display(MLexamp.7)
+M7.sim <- sim(MLexamp.7)
+```
 
 [1] Examples include Gelman and Hill, Gelman et al. 2013, etc. 
