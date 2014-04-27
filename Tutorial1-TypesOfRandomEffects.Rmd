@@ -1,0 +1,106 @@
+---
+title: "Mixed Effect Model Types"
+author: "Jared E. Knowles"
+date: "Saturday, April 26, 2014"
+output: html_document
+---
+
+```{r setup, echo=FALSE, error=FALSE, message=FALSE, eval=TRUE, results='hide'}
+opts_chunk$set(dev='svg', fig.width=6, fig.height=6, echo=TRUE, 
+               message=FALSE, error=FALSE, warning=FALSE)
+
+```
+
+
+# Introduction
+
+First of all, be warned, the terminology surrounding multilevel models is vastly 
+inconsistent. For example, multilevel models themselves may be referred to as 
+hierarchical linear models, random effects models, multilevel models, random 
+intercept models, random slope models, or pooling models. Depending on the 
+discipline, software used, and the academic literature many of these terms may 
+be referring to the same general modeling strategy. In this tutorial I will 
+attempt to provide a user guide to multilevel modeling by demonstrating how 
+to fit multilevel models in R and by attempting to connect the model fitting 
+procedure to commonly used terminology used regarding these models. 
+
+We will cover the following topics: 
+
+- Fitting and evaluating random intercept models
+- Fitting and evaluating random slope models
+- Cross level interactions
+- Non-nested random effect terms
+
+If you haven't already, make sure you head over to the [Getting Started With 
+Multilevel Models tutorial](http://jaredknowles.com/journal/2013/11/25/getting-started-with-mixed-effect-models-in-r)
+in order to ensure you have set up your environment correctly and installed all 
+the necessary packages. The tl;dr is that you will need:
+
+- A current version of R (2.15 or greater)
+- The `lme4` package (`install.packages("lme4")`)
+
+
+# Read in the data
+
+Multilevel models are appropriate for a particular kind of data structure where 
+units are nested within groups (generally 5+ groups) and where we want to model 
+the group structure of the data. For our introductory example we will start with 
+a simple example from the `lme4` documentation and explain what the model is doing. 
+We will use data from Jon Starkweather at the [University of North Texas](http://www.unt.edu/rss/class/Jon/R_SC/). Visit the excellent tutorial [available here for more.](http://www.unt.edu/rss/class/Jon/R_SC/Module9/LMM_Examples.R)
+
+```{r loadandviewdata}
+library(lme4) # load library
+library(arm) # convenience functions for regression in R
+lmm.data <- read.table("http://www.unt.edu/rss/class/Jon/R_SC/Module9/lmm.data.txt",
+   header=TRUE, sep=",", na.strings="NA", dec=".", strip.white=TRUE)
+#summary(lmm.data)
+head(lmm.data)
+```
+
+Here we have data on the extroversion of subjects nested within classes and within 
+schools. 
+
+# Fit and evaluate a random intercept model
+
+In the last tutorial we fit a series of random intercept models to our nested data. 
+We will examine the `lmerMod` object produced when we fit this model in much 
+more depth in order to understand how to work with mixed effect models in R. We 
+start by fitting a the basic example below:
+
+```{r lmer1}
+MLexamp1 <- lmer(extro ~ open + agree + social + (1|school), data=lmm.data)
+summary(MLexamp1)
+```
+
+First, we see that `MLexamp1` is now an R object of the class `lmerMod`. This 
+`lmerMod` object has the following structure:
+
+```{r lmermod}
+slotNames(MLexamp1)
+#showMethods(classes="lmerMod")
+```
+
+
+## Non-nested Classes
+
+```{r lmer2}
+MLexamp.7 <- lmer(extro ~ open + agree + social + (1|school) + (1|class), data=lmm.data)
+display(MLexamp.7)
+```
+
+## Nested group effects
+
+And finally, we can fit nested group effect terms through the following syntax:
+
+```{r lmer3}
+MLexamp.8 <- lmer(extro ~ open + agree + social + (1|school/class), data=lmm.data)
+display(MLexamp.8)
+
+
+```
+
+Here the `(1|school/class)` says that we want to fit a mixed effect term for varying 
+intercepts `1|` by schools, and for classes that are nested within schools. 
+
+
+
