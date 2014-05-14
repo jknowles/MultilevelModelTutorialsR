@@ -26,10 +26,9 @@ procedure to commonly used terminology used regarding these models.
 
 We will cover the following topics: 
 
-- Fitting and evaluating random intercept models
-- Fitting and evaluating random slope models
-- Cross level interactions
-- Non-nested random effect terms
+- The structure and methods of `merMod` objects
+- Extracting random effects of `merMod` objects
+- Plotting and interpreting `merMod` objects
 
 If you haven't already, make sure you head over to the [Getting Started With 
 Multilevel Models tutorial](http://jaredknowles.com/journal/2013/11/25/getting-started-with-mixed-effect-models-in-r)
@@ -38,7 +37,6 @@ the necessary packages. The tl;dr is that you will need:
 
 - A current version of R (2.15 or greater)
 - The `lme4` package (`install.packages("lme4")`)
-
 
 # Read in the data
 
@@ -78,6 +76,40 @@ First, we see that `MLexamp1` is now an R object of the class `lmerMod`. This
 ```{r lmermod}
 slotNames(MLexamp1)
 #showMethods(classes="lmerMod")
+```
+
+The `merMod` object has a number of methods available -- too many to enumerate 
+here. But, we will go over someo f the more common. 
+
+
+```{r modMethods}
+methods(class = "merMod")
+
+```
+
+A common need is to extract the fixed effects from a `merMod` object. `fixef` 
+extracts a named numeric vector of the fixed effects, which is handy. 
+
+```{r fixef}
+fixef(MLexamp1)
+
+```
+
+Another common need is to extract the residual standard error, which is necessary 
+for calculating effect sizes. To get a named vector of the residual standard 
+error:
+
+```{r sigmaef}
+sigma(MLexamp1)
+```
+
+For example, it is common practice in education research to standardize fixed 
+effects into "effect sizes" by dividing the fixed effect paramters by the residual 
+standard error, which can be accomplished in `lme4` easily:
+
+```{r effsize}
+fixef(MLexamp1) / sigma(MLexamp1)
+
 ```
 
 
