@@ -1,0 +1,66 @@
+---
+title: "Tutorial2-ProperSpecificationofREmodels"
+author: "Jared Knowles"
+date: "Saturday, May 17, 2014"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+summary(cars)
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+## Non-nested Classes
+
+```{r lmer2}
+MLexamp.7 <- lmer(extro ~ open + agree + social + (1|school) + (1|class), data=lmm.data)
+display(MLexamp.7)
+```
+
+## Nested group effects
+
+And finally, we can fit nested group effect terms through the following syntax:
+
+```{r lmer3}
+MLexamp.8 <- lmer(extro ~ open + agree + social + (1|school/class), data=lmm.data)
+display(MLexamp.8)
+
+
+```
+
+Here the `(1|school/class)` says that we want to fit a mixed effect term for varying 
+intercepts `1|` by schools, and for classes that are nested within schools. 
+
+
+```{r}
+MLexamp2 <- update(MLexamp1, .~ . + (1|class)) # add a intercept for class
+MLexamp2 <- lmer(extro ~ open + agree + social + (1|class) + (1|school), 
+                 data = lmm.data)
+exactRLRT(m = MLexamp1, mA=MLexamp2, 
+          m0 = )
+```
+
+## Non-correlated random effects
+
+```{r lmer4}
+MLexampUnCor <- lmer(extro ~ open + agree + social + (1|school/class) + (0 + open|school/class), 
+                     data = lmm.data)
+MLexampCor <- lmer(extro ~ open + agree + social + (1+open|school/class),
+                     data = lmm.data)
+
+VarCorr(MLexampUnCor)
+VarCorr(MLexampCor)
+```
