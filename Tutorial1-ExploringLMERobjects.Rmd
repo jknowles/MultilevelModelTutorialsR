@@ -58,8 +58,8 @@ tutorial [available here for more.](http://www.unt.edu/rss/class/Jon/R_SC/Module
 ```{r loadandviewdata}
 library(lme4) # load library
 library(arm) # convenience functions for regression in R
-lmm.data <- read.table("http://www.unt.edu/rss/class/Jon/R_SC/Module9/lmm.data.txt",
-   header=TRUE, sep=",", na.strings="NA", dec=".", strip.white=TRUE)
+lmm.data <- read.table("http://bayes.acs.unt.edu:8083/BayesContent/class/Jon/R_SC/Module9/lmm.data.txt",
+            header=TRUE, sep=",", na.strings="NA", dec=".", strip.white=TRUE)
 #summary(lmm.data)
 head(lmm.data)
 ```
