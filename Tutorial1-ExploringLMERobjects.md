@@ -5,6 +5,7 @@ date: "Saturday, May 17, 2014"
 output: 
   html_document: 
     keep_md: yes
+    self_contained: no
 ---
 
 
@@ -496,12 +497,12 @@ REsim(MLexamp1, whichel = "school", nsims = 1000)
 
 ```
 ##    X1          X2       mean     median       sd
-## 1   I (Intercept) -14.133834 -14.157333 3.871655
-## 2  II (Intercept)  -6.230981  -6.258464 3.873329
-## 3 III (Intercept)  -2.011822  -2.034863 3.872661
-## 4  IV (Intercept)   1.915608   1.911129 3.866870
-## 5   V (Intercept)   6.282461   6.299311 3.867046
-## 6  VI (Intercept)  13.901818  13.878827 3.873950
+## 1   I (Intercept) -14.088205 -14.287477 3.923270
+## 2  II (Intercept)  -6.183570  -6.369473 3.937168
+## 3 III (Intercept)  -1.956252  -2.078317 3.925270
+## 4  IV (Intercept)   1.968866   1.843241 3.930132
+## 5   V (Intercept)   6.344076   6.142423 3.925949
+## 6  VI (Intercept)  13.954781  13.770879 3.919504
 ```
 
 The `REsim` function returns for each school the level name `X1`, the estimate name, `X2`, the mean
