@@ -9,18 +9,17 @@ output: html_document
 
 # Introduction
 
-Analysts dealing with grouped data and complex hierarchical structures in their 
-data ranging from measurements nested within participants, to counties nested within 
-states or students nested within classrooms often find themselves in need of modeling 
-tools to reflect this structure of their data. In R there are two predominant ways 
-to fit multilevel models that account for such structure in the data. These tutorials 
-will show the user how to use both the `lme4` package in R to fit linear and nonlinear 
-mixed effect models, and to use `rstan` to fit fully Bayesian multilevel models. The 
-focus here will be on how to fit the models in R and not the theory behind the models. 
-For background on multilevel modeling, see the references. [1]
+Analysts dealing with grouped data and complex hierarchical structures in their data ranging from
+measurements nested within participants, to counties nested within states or students nested within
+classrooms often find themselves in need of modeling tools to reflect this structure of their data.
+In R there are two predominant ways to fit multilevel models that account for such structure in the
+data. These tutorials will show the user how to use both the `lme4` package in R to fit linear and
+nonlinear mixed effect models, and to use `rstan` to fit fully Bayesian multilevel models. The focus
+here will be on how to fit the models in R and not the theory behind the models. For background on
+multilevel modeling, see the references. [1]
 
-This tutorial will cover getting set up and running a few basic models using `lme4` 
-in R. Future tutorials will cover:
+This tutorial will cover getting set up and running a few basic models using `lme4` in R. Future
+tutorials will cover:
 
 * constructing varying intercept, varying slope, and varying slope and intercept models in R
 * generating predictions and interpreting parameters from mixed-effect models
@@ -29,12 +28,11 @@ in R. Future tutorials will cover:
 
 # Setting up your enviRonment
 
-Getting started with multilevel modeling in R is simple. `lme4` is the canonical 
-package for implementing multilevel models in R, though there are a number of packages 
-that depend on and enhance its feature set, including Bayesian extensions. `lme4` 
-has been recently rewritten to improve speed and to incorporate a C++ codebase, and 
-as such the features of the package are somewhat in flux. Be sure to update the package 
-frequently. 
+Getting started with multilevel modeling in R is simple. `lme4` is the canonical package for
+implementing multilevel models in R, though there are a number of packages that depend on and
+enhance its feature set, including Bayesian extensions. `lme4` has been recently rewritten to
+improve speed and to incorporate a C++ codebase, and as such the features of the package are
+somewhat in flux. Be sure to update the package frequently.
 
 To install `lme4`, we just run:
 
@@ -56,11 +54,13 @@ options(width = 100)
 
 # Read in the data
 
-Multilevel models are appropriate for a particular kind of data structure where 
-units are nested within groups (generally 5+ groups) and where we want to model 
-the group structure of the data. For our introductory example we will start with 
-a simple example from the `lme4` documentation and explain what the model is doing. 
-We will use data from Jon Starkweather at the [University of North Texas](http://bayes.acs.unt.edu:8083/BayesContent/class/Jon/). Visit the excellent tutorial [available here for more.](http://bayes.acs.unt.edu:8083/BayesContent/class/Jon/Benchmarks/LinearMixedModels_JDS_Dec2010.pdf)
+Multilevel models are appropriate for a particular kind of data structure where units are nested
+within groups (generally 5+ groups) and where we want to model the group structure of the data. For
+our introductory example we will start with a simple example from the `lme4` documentation and
+explain what the model is doing. We will use data from Jon Starkweather at the [University of North
+Texas](http://bayes.acs.unt.edu:8083/BayesContent/class/Jon/). Visit the excellent tutorial
+[available here for
+more.](http://bayes.acs.unt.edu:8083/BayesContent/class/Jon/Benchmarks/LinearMixedModels_JDS_Dec2010.pdf)
 
 ```{r loadandviewdata}
 library(lme4) # load library
@@ -71,32 +71,29 @@ lmm.data <- read.table("http://bayes.acs.unt.edu:8083/BayesContent/class/Jon/R_S
 head(lmm.data)
 ```
 
-Here we have data on the extroversion of subjects nested within classes and within 
-schools. 
+Here we have data on the extroversion of subjects nested within classes and within schools.
 
 # Fit the Non-Multilevel Models
 
-Let's start by fitting a simple OLS regression of measures of openness, agreeableness, 
-and socialability on extroversion. Here we use the `display` function in the 
-excellent `arm` package for abbreviated output. Other options include `stargazer` 
-for LaTeX typeset tables, `xtable`, or the `ascii` package for more flexible 
-plain text output options. 
+Let's start by fitting a simple OLS regression of measures of openness, agreeableness, and
+socialability on extroversion. Here we use the `display` function in the excellent `arm` package for
+abbreviated output. Other options include `stargazer` for LaTeX typeset tables, `xtable`, or the
+`ascii` package for more flexible plain text output options.
 
 ```{r nonlmermodels}
 OLSexamp <- lm(extro ~ open + agree + social, data = lmm.data)
 display(OLSexamp)
 ```
 
-So far this model does not fit very well at all. The R model interface is quite a 
-simple one with the dependent variable being specified first, followed by the 
-`~` symbol. The righ hand side, predictor variables, are each named. Addition 
-signs indicate that these are modeled as additive effects. Finally, we specify 
-that datframe on which to calculate the model. Here we use the `lm` function to 
-perform OLS regression, but there are many other options in R. 
+So far this model does not fit very well at all. The R model interface is quite a simple one with
+the dependent variable being specified first, followed by the `~` symbol. The righ hand side,
+predictor variables, are each named. Addition signs indicate that these are modeled as additive
+effects. Finally, we specify that datframe on which to calculate the model. Here we use the `lm`
+function to perform OLS regression, but there are many other options in R.
 
-If we want to extract measures such as the AIC, we may prefer to fit a generalized 
-linear model with `glm` which produces a model fit through maximum likelihood 
-estimation. Note that the model formula specification is the same. 
+If we want to extract measures such as the AIC, we may prefer to fit a generalized linear model with
+`glm` which produces a model fit through maximum likelihood estimation. Note that the model formula
+specification is the same.
 
 ```{r nonlmerglm}
 MLexamp <- glm(extro ~ open + agree + social, data=lmm.data)
@@ -108,9 +105,9 @@ This results in a poor model fit. Let's look at a simple varying intercept model
 
 # Fit a varying intercept model
 
-Depending on disciplinary norms, our next step might be to fit a varying intercept 
-model using a grouping variable such as school or classes. Using the `glm` function 
-and the familiar formula interface, such a fit is easy:
+Depending on disciplinary norms, our next step might be to fit a varying intercept model using a
+grouping variable such as school or classes. Using the `glm` function and the familiar formula
+interface, such a fit is easy:
 
 ```{r nonlmerfixedeffect}
 MLexamp.2 <- glm(extro ~ open + agree + social + class, data=lmm.data )
@@ -119,10 +116,9 @@ AIC(MLexamp.2)
 anova(MLexamp, MLexamp.2, test="F")
 ```
 
-This is called a fixed-effects specification often. This is simply the case of 
-fitting a separate dummy variable as a predictor for each class. We can see 
-this does not provide much additional model fit. Let's see if school performs 
-any better. 
+This is called a fixed-effects specification often. This is simply the case of fitting a separate
+dummy variable as a predictor for each class. We can see this does not provide much additional model
+fit. Let's see if school performs any better.
 
 ```{r nonlmerfixedeffect2}
 MLexamp.3 <- glm(extro ~ open + agree + social + school, data=lmm.data )
@@ -131,31 +127,30 @@ AIC(MLexamp.3)
 anova(MLexamp, MLexamp.3, test="F")
 ```
 
-The school effect greatly improves our model fit. However, how do we interpret these
-effects? 
+The school effect greatly improves our model fit. However, how do we interpret these effects?
 
 ```{r effectbreakdown}
 table(lmm.data$school, lmm.data$class)
 
 ```
 
-Here we can see we have a perfectly balanced design with fifty observations in 
-each combination of class and school (if only data were always so nice!). 
+Here we can see we have a perfectly balanced design with fifty observations in each combination of
+class and school (if only data were always so nice!).
 
-Let's try to model each of these unique cells. To do this, we fit a model and use 
-the `:` operator to specify the interaction between `school` and `class`. 
+Let's try to model each of these unique cells. To do this, we fit a model and use the `:` operator
+to specify the interaction between `school` and `class`.
 
-```{r itneraction}
+```{r interaction}
 MLexamp.4 <- glm(extro ~ open + agree + social + school:class, data=lmm.data )
 display(MLexamp.4)
 AIC(MLexamp.4)
 ```
 
-This is very useful, but what if we want to understand both the effect of the 
-school and the effect of the class, as well as the effect of the schools and classes? 
-Unfortunately, this is not easily done with the standard `glm`. 
+This is very useful, but what if we want to understand both the effect of the school and the effect
+of the class, as well as the effect of the schools and classes? Unfortunately, this is not easily
+done with the standard `glm`.
 
-```{r itneraction2}
+```{r interaction2}
 MLexamp.5 <- glm(extro ~ open + agree + social + school*class - 1, data=lmm.data )
 display(MLexamp.5)
 AIC(MLexamp.5)
@@ -163,10 +158,9 @@ AIC(MLexamp.5)
 
 # Exploring Random Slopes
 
-Another alternative is to fit a separate model for each of the school and class 
-combinations. If we believe the relationsihp between our variables may be highly 
-dependent on the school and class combination, we can simply fit a series of models 
-and explore the parameter variation among them:
+Another alternative is to fit a separate model for each of the school and class combinations. If we
+believe the relationsihp between our variables may be highly dependent on the school and class
+combination, we can simply fit a series of models and explore the parameter variation among them:
 
 ```{r}
 require(plyr)
@@ -178,18 +172,17 @@ display(modellist[[2]])
 
 ```
 
-We will discuss this strategy in more depth in future tutorials including how to 
-performan inference on the list of models produced in this command. 
+We will discuss this strategy in more depth in future tutorials including how to performan inference
+on the list of models produced in this command.
 
 # Fit a varying intercept model with lmer
 
-Enter `lme4`. While all of the above techniques are valid approaches to this problem, 
-they are not necessarily the best approach when we are interested explicitly in 
-variation among and by groups. This is where a mixed-effect modeling framework 
-is useful. Now we use the `lmer` function with the familiar formula interface, 
-but now group level variables are specified using a special syntax: `(1|school)` 
-tells `lmer` to fit a linear model with a varying-intercept group effect using 
-the variable `school`. 
+Enter `lme4`. While all of the above techniques are valid approaches to this problem, they are not
+necessarily the best approach when we are interested explicitly in variation among and by groups.
+This is where a mixed-effect modeling framework is useful. Now we use the `lmer` function with the
+familiar formula interface, but now group level variables are specified using a special syntax:
+`(1|school)` tells `lmer` to fit a linear model with a varying-intercept group effect using the
+variable `school`.
 
 ```{r lmer1}
 MLexamp.6 <- lmer(extro ~ open + agree + social + (1|school), data=lmm.data)
@@ -213,17 +206,16 @@ display(MLexamp.8)
 
 ```
 
-Here the `(1|school/class)` says that we want to fit a mixed effect term for varying 
-intercepts `1|` by schools, and for classes that are nested within schools. 
+Here the `(1|school/class)` says that we want to fit a mixed effect term for varying intercepts `1|`
+by schools, and for classes that are nested within schools.
 
 # Fit a varying slope model with lmer
 
-But, what if we want to explore the effect of different student level indicators 
-as they vary across classrooms. Instead of fitting unique models by school (or school/class) 
-we can fit a varying slope model. Here we modify our random effect term to include 
-variables before the grouping terms: `(1 + open|school/class)` tells R to fit 
-a varying slope and varying intercept model for schools and classes nested within 
-schools, and to allow the slope of the `open` variable to vary by school. 
+But, what if we want to explore the effect of different student level indicators as they vary across
+classrooms. Instead of fitting unique models by school (or school/class) we can fit a varying slope
+model. Here we modify our random effect term to include variables before the grouping terms: 
+`(1 +open|school/class)` tells R to fit a varying slope and varying intercept model for schools and
+classes nested within schools, and to allow the slope of the `open` variable to vary by school.
 
 ```{r lmer4}
 MLexamp.9 <- lmer(extro ~ open + agree + social + (1+open|school/class), data=lmm.data)
@@ -232,10 +224,10 @@ display(MLexamp.9)
 
 # Conclusion
 
-Fitting mixed effect models and exploring group level variation is very easy within 
-the R language and ecosystem. In future tutorials we will explore comparing across 
-models, doing inference with mixed-effect models, and creating graphical representations 
-of mixed effect models to understand their effects. 
+Fitting mixed effect models and exploring group level variation is very easy within the R language
+and ecosystem. In future tutorials we will explore comparing across models, doing inference with
+mixed-effect models, and creating graphical representations of mixed effect models to understand
+their effects.
 
 # Appendix
 

@@ -708,7 +708,7 @@ display(MLexamp.8)</code></pre>
 </div>
 <div id="fit-a-varying-slope-model-with-lmer" class="section level1">
 <h1>Fit a varying slope model with lmer</h1>
-<p>But, what if we want to explore the effect of different student level indicators as they vary across classrooms. Instead of fitting unique models by school (or school/class) we can fit a varying slope model. Here we modify our random effect term to include variables before the grouping terms: <code>(1 + open|school/class)</code> tells R to fit a varying slope and varying intercept model for schools and classes nested within schools, and to allow the slope of the <code>open</code> variable to vary by school.</p>
+<p>But, what if we want to explore the effect of different student level indicators as they vary across classrooms. Instead of fitting unique models by school (or school/class) we can fit a varying slope model. Here we modify our random effect term to include variables before the grouping terms: <code>(1 +open|school/class)</code> tells R to fit a varying slope and varying intercept model for schools and classes nested within schools, and to allow the slope of the <code>open</code> variable to vary by school.</p>
 <pre class="r"><code>MLexamp.9 &lt;- lmer(extro ~ open + agree + social + (1+open|school/class), data=lmm.data)
 display(MLexamp.9)</code></pre>
 <pre><code>## lmer(formula = extro ~ open + agree + social + (1 + open | school/class), 
