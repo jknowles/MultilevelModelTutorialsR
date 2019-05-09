@@ -50,10 +50,9 @@ the necessary packages. The tl;dr is that you will need:
 
 Multilevel models are appropriate for a particular kind of data structure where 
 units are nested within groups (generally 5+ groups) and where we want to model 
-the group structure of the data. We will use data from Jon Starkweather at the 
-[University of North Texas](http://www.unt.edu/rss/class/Jon/R_SC/) on student 
-social attributes within schools and classes. Visit the excellent 
-tutorial [available here for more.](http://www.unt.edu/rss/class/Jon/R_SC/Module9/LMM_Examples.R)
+the group structure of the data. For our introductory example we will start with 
+a simple example from the `lme4` documentation and explain what the model is doing. 
+We will use data from Jon Starkweather at the [University of North Texas](http://bayes.acs.unt.edu:8083/BayesContent/class/Jon/). Visit the excellent tutorial [available here for more.](http://bayes.acs.unt.edu:8083/BayesContent/class/Jon/Benchmarks/LinearMixedModels_JDS_Dec2010.pdf)
 
 ```{r loadandviewdata}
 library(lme4) # load library

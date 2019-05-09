@@ -1,5 +1,9 @@
-Getting Started with Multilevel Modeling in R
-========================================================
+---
+title: "Getting Started with Multilevel Modeling in R"
+author: "Jared E. Knowles"
+date: "November, 25, 2013"
+output: html_document
+---
 
 ## Jared E. Knowles
 
@@ -44,7 +48,8 @@ install_github("lme4",user="lme4")
 ```
 
 ```{r setup, echo=FALSE, error=FALSE, message=FALSE, eval=TRUE, results='hide'}
-opts_chunk$set(dev='svg', fig.width=6, fig.height=6, echo=TRUE, 
+library(knitr)
+knitr::opts_chunk$set(dev='svg', fig.width=6, fig.height=6, echo=TRUE, 
                message=FALSE, error=FALSE, warning=FALSE)
 
 ```
@@ -55,7 +60,7 @@ Multilevel models are appropriate for a particular kind of data structure where
 units are nested within groups (generally 5+ groups) and where we want to model 
 the group structure of the data. For our introductory example we will start with 
 a simple example from the `lme4` documentation and explain what the model is doing. 
-We will use data from Jon Starkweather at the [University of North Texas](http://www.unt.edu/rss/class/Jon/R_SC/). Visit the excellent tutorial [available here for more.](http://www.unt.edu/rss/class/Jon/R_SC/Module9/LMM_Examples.R)
+We will use data from Jon Starkweather at the [University of North Texas](http://bayes.acs.unt.edu:8083/BayesContent/class/Jon/). Visit the excellent tutorial [available here for more.](http://bayes.acs.unt.edu:8083/BayesContent/class/Jon/Benchmarks/LinearMixedModels_JDS_Dec2010.pdf)
 
 ```{r loadandviewdata}
 library(lme4) # load library
