@@ -49,9 +49,9 @@ install_github("lme4",user="lme4")
 
 ```{r setup, echo=FALSE, error=FALSE, message=FALSE, eval=TRUE, results='hide'}
 library(knitr)
-knitr::opts_chunk$set(dev='svg', fig.width=6, fig.height=6, echo=TRUE, 
+knitr::opts_chunk$set(dev='png', fig.width=8, fig.height=6, echo=TRUE, 
                message=FALSE, error=FALSE, warning=FALSE)
-
+options(width = 100)
 ```
 
 # Read in the data
